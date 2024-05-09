@@ -217,6 +217,8 @@ GameObject:
   m_Component:
   - component: {fileID: 396776331}
   - component: {fileID: 396776330}
+  - component: {fileID: 396776332}
+  - component: {fileID: 396776333}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -252,6 +254,61 @@ Transform:
   - {fileID: 1817580815}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &396776332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396776329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 128cdcb993241a5f4afc909098a34a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activePiece: {fileID: 0}
+  tetrominos:
+  - tetromino: 0
+    tile: {fileID: 11400000, guid: 53bfd668014334a3ea95613e8072bc3c, type: 2}
+    cells: []
+  - tetromino: 1
+    tile: {fileID: 11400000, guid: 20b33eec22e279b1eba1fb3049a2ea2b, type: 2}
+    cells: []
+  - tetromino: 2
+    tile: {fileID: 11400000, guid: 5e008f75a22c60e5a87d42c459b4cc6d, type: 2}
+    cells: []
+  - tetromino: 3
+    tile: {fileID: 11400000, guid: cfbe14b7a7889e302aaf22435e0560d7, type: 2}
+    cells: []
+  - tetromino: 4
+    tile: {fileID: 11400000, guid: 2470625f038aff5f688fb76fc8d4c339, type: 2}
+    cells: []
+  - tetromino: 5
+    tile: {fileID: 11400000, guid: 070c9bb0f1e60f27f9532915aef52107, type: 2}
+    cells: []
+  - tetromino: 6
+    tile: {fileID: 11400000, guid: 905777801de9facfeb4f4b1a6b346217, type: 2}
+    cells: []
+  spawnPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &396776333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396776329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6af30d68a5c82d4f8b9a3b8290985def, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  board: {fileID: 0}
+  data:
+    tetromino: 0
+    tile: {fileID: 0}
+    cells: []
+  position: {x: 0, y: 0, z: 0}
+  cells: []
 --- !u!1 &414855218
 GameObject:
   m_ObjectHideFlags: 0
