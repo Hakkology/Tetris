@@ -7,8 +7,9 @@ public class Board : MonoBehaviour
     public Piece activePiece; // Şu anda aktif olan Tetris parçası
     public TetrominoData[] tetrominos; // Mevcut tetrominoların veri dizisi
     public Vector3Int spawnPosition; // Yeni parçaların başlatılacağı konum, değiştirerek yukarı alabiliriz. (-1, 8) 10 en yukarısı, 8 e çekmeliyiz.
-    public int boardWidth = 10;
-    public int boardHeight = 20;
+
+    private int boardWidth = 10;
+    private int boardHeight = 20;
 
     // Başlangıçta çalışan metod
     public void Awake() {
@@ -26,7 +27,7 @@ public class Board : MonoBehaviour
     }
 
     // Yeni bir parça üretmek için kullanılan metod
-    private void SpawnPiece() {
+    public void SpawnPiece() {
         // Rastgele bir tetromino seçerek onu spawn edeceğiz.
         int random = Random.Range(0, tetrominos.Length); // Rastgele bir tetromino seç
         TetrominoData data = this.tetrominos[random]; // Rastgele seçilen tetromino verisini al
@@ -36,7 +37,19 @@ public class Board : MonoBehaviour
         // Spawn position üzerinden tüm hücreleri hareket ettiriyoruz.
         // Sonra da buna göre tileı değiştiryoruz.
         this.activePiece.Initialize(this, this.spawnPosition, data); // Aktif parçayı başlat
-        Set(this.activePiece); // Parçayı tahtada yerleştir
+
+        if (isPositionValid(this.activePiece, this.spawnPosition))
+        {
+            Set(this.activePiece); // Parçayı tahtada yerleştir
+        }
+
+        GameOver();
+    }
+
+    private void GameOver()
+    {
+        this.tilemap.ClearAllTiles();
+        // buraya farklı şeyler eklenebilir.
     }
 
     // Bir parçanın tüm karelerini tahtada yerleştirmek için kullanılan metod
@@ -80,7 +93,7 @@ public class Board : MonoBehaviour
         return true;
     }
 
-        // Sınır kontrolü için kullanılan fonksiyon
+    // Sınır kontrolü için kullanılan fonksiyon
     private bool IsInBorders(Vector3Int position)
     {
         // X koordinatının sınırlar içinde olup olmadığını kontrol ediyoruz.
@@ -93,4 +106,78 @@ public class Board : MonoBehaviour
 
         return withinXBounds && withinYBounds;
     }
+
+    public void ClearLines()
+    {
+        int completedLines = 0;
+
+        // Y koordinatını tahtanın altından üstüne doğru kontrol et
+        int maxY = -boardHeight / 2; // maxY başlangıç değeri
+        for (int y = -boardHeight / 2; y < boardHeight / 2; y++)
+        {
+            if (IsLineComplete(y))
+            {
+                ClearLine(y);
+                completedLines++;
+                maxY = y; // En son temizlenen satırı güncelle
+            }
+        }
+
+        // Temizlenen satır sayısına göre üst satırları aşağı kaydır
+        if (completedLines > 0)
+        {
+            MoveAllLinesDown(maxY + 1, completedLines);
+        }
+    }
+
+
+    private bool IsLineComplete(int y)
+    {
+        // Tahtanın genişliği boyunca her hücreyi kontrol et
+        for (int x = -boardWidth / 2; x < boardWidth / 2; x++)
+        {
+            Vector3Int position = new Vector3Int(x, y, 0);
+            if (!tilemap.HasTile(position))
+            {
+                return false;  // Eğer bir hücre boşsa, satır tamamlanmamış demektir.
+            }
+        }
+        return true;  // Tüm hücreler doluysa, satır tamamlanmıştır.
+    }
+
+    private void ClearLine(int y)
+    {
+        // Satırdaki tüm hücreleri temizle
+        for (int x = -boardWidth / 2; x < boardWidth / 2; x++)
+        {
+            Vector3Int position = new Vector3Int(x, y, 0);
+            tilemap.SetTile(position, null);
+        }
+    }
+
+    private void MoveAllLinesDown(int startY, int moveCount)
+    {
+        // startY'den başlayarak tüm satırları moveCount kadar aşağı kaydır
+        for (int y = startY; y < boardHeight / 2; y++)
+        {
+            MoveLineDown(y, moveCount);
+        }
+    }
+
+    private void MoveLineDown(int y, int moveCount)
+    {
+        // Belirli bir satırdaki tüm hücreleri bir satır aşağı taşı
+        for (int x = -boardWidth / 2; x < boardWidth / 2; x++)
+        {
+            Vector3Int originalPosition = new Vector3Int(x, y, 0);
+            Tile tile = tilemap.GetTile<Tile>(originalPosition);
+            if (tile != null)
+            {
+                Vector3Int newPosition = new Vector3Int(x, y - moveCount, 0);
+                tilemap.SetTile(newPosition, tile);
+                tilemap.SetTile(originalPosition, null);  // Eski pozisyonu temizle
+            }
+        }
+    }
+
 }

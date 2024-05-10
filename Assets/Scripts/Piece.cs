@@ -10,12 +10,22 @@ public class Piece : MonoBehaviour
     public Vector3Int[] cells; // Parçanın kafes içindeki hücre pozisyonları
     public int rotationIndex; // mevcut dönüm endeksi.
 
+    public float stepDelay = 1f;
+    public float lockDelay = .5f;
+
+
+    private float stepTime;
+    private float lockTime;
+
     // Parçayı başlatmak için kullanılan metod
     public void Initialize(Board board, Vector3Int position, TetrominoData data) {
         this.board = board; // Tahta referansını ayarla
         this.position = position; // Başlangıç pozisyonunu ayarla
         this.data = data; // Tetromino verisini ayarla
         this.rotationIndex = 0; // ilk indexi 0 olarak ayarla.
+
+        this.stepTime = Time.time + this.stepDelay;
+        this.lockTime = 0f;
 
         // Hücre dizisini başlat veya boyutunu ayarla
         if (this.cells == null || this.cells.Length != data.cells.Length) {
@@ -33,6 +43,9 @@ public class Piece : MonoBehaviour
         // İlk olarak bulunduğu noktayı temizle.
         this.board.Clear(this);
         // A ya basınca sola, D ye basınca sağa gideceğiz. Hareket fonksiyonunu çalıştır.
+
+        this.lockTime += Time.deltaTime;
+
         if (Input.GetKeyDown(KeyCode.A))
         {
             Move(Vector2Int.left);
@@ -62,8 +75,32 @@ public class Piece : MonoBehaviour
             Fall();
         }
 
+        if (Time.time >= this.stepTime)
+        {
+            Step();
+        }
+
         // Son olarak yeni konumu board a gönder.
         this.board.Set(this);
+    }
+
+    private void Step()
+    {
+        this.stepTime = Time.time + this.stepDelay;
+
+        Move(Vector2Int.down);
+
+        if (this.lockTime >= this.lockDelay)
+        {
+            Lock();
+        }
+    }
+
+    private void Lock()
+    {
+        this.board.Set(this);
+        this.board.ClearLines();
+        this.board.SpawnPiece();
     }
 
     bool Move(Vector2Int translation)
@@ -79,6 +116,7 @@ public class Piece : MonoBehaviour
         if (valid)
         {
             this.position = newPosition;
+            this.lockTime = 0;
         }
 
         return valid;
@@ -90,6 +128,8 @@ public class Piece : MonoBehaviour
         {
             continue;
         }
+
+        Lock();
     }
 
     private void Rotate(int direction)
@@ -107,6 +147,7 @@ public class Piece : MonoBehaviour
             this.rotationIndex = initialRotationIndex;
             ApplyRotation(-direction);
         }
+
     }
 
     void ApplyRotation(int direction)
