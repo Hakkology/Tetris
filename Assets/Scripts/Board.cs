@@ -112,23 +112,25 @@ public class Board : MonoBehaviour
     public void ClearLines()
     {
         int completedLines = 0;
+        int lowestClearedLine = int.MaxValue; // En düşük temizlenen satırın başlangıç değeri
 
         // Y koordinatını tahtanın altından üstüne doğru kontrol et
-        int maxY = -boardHeight / 2; // maxY başlangıç değeri
         for (int y = -boardHeight / 2; y < boardHeight / 2; y++)
         {
             if (IsLineComplete(y))
             {
                 ClearLine(y);
                 completedLines++;
-                maxY = y; // En son temizlenen satırı güncelle
+                if (y < lowestClearedLine) {
+                    lowestClearedLine = y; // En düşük temizlenen satırı güncelle
+                }
             }
         }
 
         // Temizlenen satır sayısına göre üst satırları aşağı kaydır
-        if (completedLines > 0)
+        if (completedLines > 0 && lowestClearedLine != int.MaxValue)
         {
-            MoveAllLinesDown(maxY + 1, completedLines);
+            MoveAllLinesDown(lowestClearedLine, completedLines);
         }
     }
 
@@ -160,7 +162,7 @@ public class Board : MonoBehaviour
     private void MoveAllLinesDown(int startY, int moveCount)
     {
         // startY'den başlayarak tüm satırları moveCount kadar aşağı kaydır
-        for (int y = startY; y < boardHeight / 2; y++)
+        for (int y = startY + moveCount; y < boardHeight / 2; y++)
         {
             MoveLineDown(y, moveCount);
         }
@@ -168,7 +170,7 @@ public class Board : MonoBehaviour
 
     private void MoveLineDown(int y, int moveCount)
     {
-        // Belirli bir satırdaki tüm hücreleri bir satır aşağı taşı
+        // Belirli bir satırdaki tüm hücreleri moveCount kadar aşağı taşı
         for (int x = -boardWidth / 2; x < boardWidth / 2; x++)
         {
             Vector3Int originalPosition = new Vector3Int(x, y, 0);
