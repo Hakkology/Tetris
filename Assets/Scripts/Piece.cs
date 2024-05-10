@@ -92,52 +92,25 @@ public class Piece : MonoBehaviour
         }
     }
 
-    // private void Rotate(int direction)
-    // {
-    //     // Geçici bir değişken oluştur ve rotationIndex ile direction'u topla.
-    //     int newRotationIndex = this.rotationIndex + direction;
-
-    //     // Yeni indexi wraple ve ardından rotationIndex'e ata.
-    //     this.rotationIndex = (newRotationIndex + 4) % 4;
-
-    //     // Bir parçanın tüm hücrelerine bunu uygulayacağız.
-    //     // Ana datayı değiştirmek istemiyoruz, kopyası olarak oluşturduğumuz cells olan hücreyi değiştireceğiz. 
-    //     // Bu sayede her spawn olduğunda data kalmaya devam edecek.
-    //     for (int i = 0; i < this.cells.Length; i++)
-    //     {
-    //         // Burada vector3Int kullanamam çünkü yarım birim değiştireceğimiz parçalar var. SRSe bakalım.
-    //         Vector3 cell = this.cells[i];
-    //         int x,y;
-
-    //         switch (this.data.tetromino)
-    //         {
-    //             case Tetromino.I:
-    //             case Tetromino.O:
-
-    //                 // Önce yarısını alıp sonra 90 derece çevirmeliyiz.
-    //                 cell.x -= .5f;
-    //                 cell.y -= .5f;
-    //                 x =  Mathf.CeilToInt((cell.x * Data.RotationMatrix[0] * direction) + (cell.y* Data.RotationMatrix[1] * direction));
-    //                 y =  Mathf.CeilToInt((cell.x * Data.RotationMatrix[2] * direction) + (cell.y* Data.RotationMatrix[3] * direction));
-    //                 break;
-    //             default:
-
-    //                 // Tamamen 90 derece çevirmeliyiz.
-    //                 x =  Mathf.RoundToInt((cell.x * Data.RotationMatrix[0] * direction) + (cell.y* Data.RotationMatrix[1] * direction));
-    //                 y =  Mathf.RoundToInt((cell.x * Data.RotationMatrix[2] * direction) + (cell.y* Data.RotationMatrix[3] * direction));
-    //                 break;
-    //         }
-
-    //         this.cells[i] = new Vector3Int(x, y, 0);
-    //     }
-    // }
-    
     private void Rotate(int direction)
     {
         // Eğer döndürme yönü 0 ise (yani hiçbir değişiklik yapma).
         if (direction == 0)
             return;
+        // İlk endeksi kaydet.
+        int initialRotationIndex = this.rotationIndex;
 
+        ApplyRotation(direction);
+
+        if (!TestWallKicks(this.rotationIndex, direction))
+        {
+            this.rotationIndex = initialRotationIndex;
+            ApplyRotation(-direction);
+        }
+    }
+
+    void ApplyRotation(int direction)
+    {
         // Dönüş açısını hesapla
         float angle = direction * 90;
 
@@ -158,7 +131,6 @@ public class Piece : MonoBehaviour
                 break;
         }
     }
-
     void RotateITetromino(float angle)
     {
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
@@ -182,6 +154,33 @@ public class Piece : MonoBehaviour
             Vector3 cellPosition = this.cells[i];
             cellPosition = rotation * cellPosition;
             this.cells[i] = new Vector3Int(Mathf.RoundToInt(cellPosition.x), Mathf.RoundToInt(cellPosition.y), 0);
+        }
+    }
+
+
+    private bool TestWallKicks(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
+
+        for (int i = 0; i < 5; i++) // Her test dizisi için 5 farklı test var
+        {
+            Vector2Int translation = this.data.wallKicks[wallKickIndex, i];
+            if (Move(translation)) {
+                return true; // Eğer taşınma başarılı ise, true dön
+            }
+        }
+        return false; // Eğer hiçbir taşınma başarılı olmadıysa, false dön
+    }
+
+    private int GetWallKickIndex(int rotationIndex, int rotationDirection)
+    {
+        int baseIndex = rotationIndex * 2; // Her rotasyon durumu için iki ayrı dizin ayır
+        if (rotationDirection > 0) {
+            // Saat yönünde dönüş, 'R' dizini
+            return baseIndex % 8; // Modulo 8 kullanarak sınırları belirle
+        } else {
+            // Saat yönünün tersine dönüş, 'L' dizini
+            return (baseIndex + 1) % 8; // Modulo 8 kullanarak sınırları belirle
         }
     }
 }
