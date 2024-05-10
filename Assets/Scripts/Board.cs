@@ -42,8 +42,10 @@ public class Board : MonoBehaviour
         {
             Set(this.activePiece); // Parçayı tahtada yerleştir
         }
-
-        GameOver();
+        else
+        {
+            GameOver();
+        }
     }
 
     private void GameOver()

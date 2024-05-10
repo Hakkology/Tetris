@@ -289,7 +289,7 @@ MonoBehaviour:
   - tetromino: 6
     tile: {fileID: 11400000, guid: 905777801de9facfeb4f4b1a6b346217, type: 2}
     cells: []
-  spawnPosition: {x: 0, y: 0, z: 0}
+  spawnPosition: {x: -1, y: 8, z: 0}
 --- !u!114 &396776333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,6 +309,9 @@ MonoBehaviour:
     cells: []
   position: {x: 0, y: 0, z: 0}
   cells: []
+  rotationIndex: 0
+  stepDelay: 1
+  lockDelay: 0.5
 --- !u!1 &414855218
 GameObject:
   m_ObjectHideFlags: 0
