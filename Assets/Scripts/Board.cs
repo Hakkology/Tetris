@@ -8,8 +8,8 @@ public class Board : MonoBehaviour
     public TetrominoData[] tetrominos; // Mevcut tetrominoların veri dizisi
     public Vector3Int spawnPosition; // Yeni parçaların başlatılacağı konum, değiştirerek yukarı alabiliriz. (-1, 8) 10 en yukarısı, 8 e çekmeliyiz.
 
-    private int boardWidth = 10;
-    private int boardHeight = 20;
+    public int boardWidth = 10;
+    public int boardHeight = 20;
 
     // Başlangıçta çalışan metod
     public void Awake() {
